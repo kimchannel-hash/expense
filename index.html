@@ -269,7 +269,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="setup-box">
           <div class="setup-title">สถานะซิงค์</div>
           <div class="setup-desc" id="pending-count-txt">—</div>
-          <button class="setup-btn" onclick="syncNow()" style="background:var(--blue);color:#fff;">ซิงค์เดี๋ยวนี้</button>
+          <button class="setup-btn" onclick="syncNow()" style="background:var(--blue);color:#fff;margin-bottom:10px;">ซิงค์เดี๋ยวนี้</button>
+          <button class="setup-btn" onclick="restoreFromSheets()" style="background:var(--amber);color:#1a0f00;">🔄 กู้คืนข้อมูลจาก Sheets</button>
         </div>
       </div>
       <div id="setup-form">
@@ -362,6 +363,63 @@ document.getElementById('today-date').textContent=DAYS[now.getDay()]+' '+now.get
 function getUrl(){return localStorage.getItem('gas_url')||'';}
 function getEntries(){try{return JSON.parse(localStorage.getItem('exp_v4')||'[]');}catch(e){return[];}}
 function setEntries(a){localStorage.setItem('exp_v4',JSON.stringify(a));}
+
+async function restoreFromSheets(){
+  const url=getUrl();
+  if(!url){showToast('ยังไม่ได้เชื่อมต่อ','a');return;}
+  showToast('กำลังดึงข้อมูล...','a');
+  try{
+    const res=await fetch(url+'?action=getAll',{method:'GET',mode:'cors'});
+    const json=await res.json();
+    if(json.status==='ok'&&json.entries&&json.entries.length>0){
+      const restored=json.entries.map(e=>({
+        id:Number(e.id),cat:e.cat,pay:e.pay,sub:e.sub==='-'?'':e.sub,
+        amount:parseFloat(e.amount)||0,note:e.note,
+        date:e.isoDate||new Date().toISOString(),
+        d:parseInt(e.day)||1,m:parseInt(e.month)-1||0,y:parseInt(e.year)||2026,
+        synced:true
+      }));
+      setEntries(restored);
+      updateSyncStatus();renderSummary();
+      showToast('กู้คืนแล้ว '+restored.length+' รายการ','g');
+    } else {
+      showToast('ไม่พบข้อมูลใน Sheets','a');
+    }
+  }catch(err){
+    showToast('ดึงข้อมูลไม่ได้ ลองใหม่','r');
+  }
+}
+
+async function restoreFromSheets(){
+  const url=getUrl();
+  if(!url){showToast('ยังไม่ได้เชื่อมต่อ','a');return;}
+  showToast('กำลังดึงข้อมูล...','a');
+  try{
+    const res=await fetch(url+'?action=getAll');
+    const json=await res.json();
+    if(json.status==='ok'&&json.entries&&json.entries.length>0){
+      const restored=json.entries.map(e=>({
+        id:Number(e.id),cat:e.cat,pay:e.pay,
+        sub:(e.sub&&e.sub!=='-')?e.sub:'',
+        amount:parseFloat(e.amount)||0,
+        note:e.note||'',
+        date:e.isoDate||new Date().toISOString(),
+        d:parseInt(e.day)||1,
+        m:parseInt(e.month)-1,
+        y:parseInt(e.year)||2026,
+        synced:true
+      }));
+      setEntries(restored);
+      updateSyncStatus();renderSummary();
+      showToast('กู้คืนแล้ว '+restored.length+' รายการ ✓','g');
+    } else {
+      showToast('ไม่พบข้อมูลใน Sheets','a');
+    }
+  }catch(err){
+    showToast('ดึงข้อมูลไม่ได้ ลองใหม่','r');
+    console.log(err);
+  }
+}
 
 function updateSyncStatus(){
   const url=getUrl(),pending=getEntries().filter(e=>!e.synced).length;
