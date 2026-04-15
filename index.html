@@ -240,7 +240,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="field-label">จำนวนเงิน</div>
         <div class="amount-box">
           <span class="amount-curr">฿</span>
-          <input class="amount-input" type="number" id="amount" placeholder="0" min="0" inputmode="decimal">
+          <input class="amount-input" type="number" id="amount" placeholder="0" min="0" inputmode="decimal" onkeydown="if(event.key==='Enter'||event.key==='Go'){event.preventDefault();document.getElementById('note').focus();}">
         </div>
       </div>
       <div class="field-group">
@@ -399,7 +399,7 @@ function saveEntry(){
   const amt=parseFloat(document.getElementById('amount').value);
   if(!selCatVal){showToast('เลือกหมวดก่อนนะ','a');return;}
   if(!selPayVal){showToast('เลือกช่องทางชำระก่อนนะ','a');return;}
-  if((selPayVal==='ธนาคาร'||selPayVal==='บัตรเครดิต')&&!selSubVal){showToast('เลือก '+selPayVal+' ให้ครบก่อนนะ','a');return;}
+  if(selPayVal==='บัตรเครดิต'&&!selSubVal){showToast('เลือกบัตรเครดิตให้ครบก่อนนะ','a');return;}
   if(!amt||amt<=0){showToast('ใส่จำนวนเงินก่อนนะ','a');return;}
   const n=new Date();
   const entry={id:Date.now(),cat:selCatVal,pay:selPayVal,sub:selSubVal,amount:amt,
@@ -434,14 +434,16 @@ async function syncNow(){
   const pending=getEntries().filter(e=>!e.synced);
   if(!pending.length){showToast('ทุกรายการซิงค์แล้ว ✓','g');return;}
   showToast('กำลังซิงค์...','a');
+  // mark all as synced first to prevent double sync
+  const all=getEntries();
+  pending.forEach(p=>{const idx=all.findIndex(e=>e.id===p.id);if(idx>=0)all[idx].synced=true;});
+  setEntries(all);
   let ok=0;
   for(const entry of pending){
     try{
       const form=new FormData();
       form.append('payload',JSON.stringify({action:'add',entry}));
       await fetch(url,{method:'POST',mode:'no-cors',body:form});
-      const all=getEntries();const idx=all.findIndex(e=>e.id===entry.id);
-      if(idx>=0){all[idx].synced=true;setEntries(all);}
       ok++;
     }catch(e){}
   }
@@ -452,6 +454,13 @@ function deleteEntry(id){
   if(!confirm('ลบรายการนี้?'))return;
   setEntries(getEntries().filter(e=>e.id!==id));
   updateSyncStatus();renderSummary();showToast('ลบแล้ว','r');
+  // sync deletion to Sheets
+  const url=getUrl();
+  if(url){
+    const form=new FormData();
+    form.append('payload',JSON.stringify({action:'delete',id:id}));
+    fetch(url,{method:'POST',mode:'no-cors',body:form}).catch(()=>{});
+  }
 }
 
 function openEdit(id){
