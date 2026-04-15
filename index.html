@@ -153,7 +153,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .modal-title{font-size:17px;font-weight:700;margin-bottom:20px;}
 .modal-row{margin-bottom:16px;}
 .modal-lbl{font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px;}
-.modal-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:13px 14px;color:var(--text);font-size:16px;font-family:var(--font);outline:none;}
+.modal-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:13px 14px;color:var(--text);font-size:16px;font-family:var(--font);outline:none;-webkit-appearance:none;appearance:none;}
 .modal-btns{display:flex;gap:10px;margin-top:20px;}
 .modal-save{flex:1;padding:14px;background:var(--green);border:none;border-radius:var(--r);font-size:15px;font-weight:700;color:#001a0d;cursor:pointer;font-family:var(--font);}
 .modal-cancel{padding:14px 20px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);font-size:15px;color:var(--text2);cursor:pointer;font-family:var(--font);}
@@ -240,7 +240,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="field-label">จำนวนเงิน</div>
         <div class="amount-box">
           <span class="amount-curr">฿</span>
-          <input class="amount-input" type="number" id="amount" placeholder="0" min="0" inputmode="decimal" onkeydown="if(event.key==='Enter'||event.key==='Go'){event.preventDefault();document.getElementById('note').focus();}">
+          <input class="amount-input" type="number" id="amount" placeholder="0" min="0" inputmode="decimal" enterkeyhint="next" onkeydown="if(event.key==='Enter'||event.key==='Next'||event.key==='Go'){event.preventDefault();document.getElementById('note').focus();}" onkeyup="if(event.key==='Enter'){event.preventDefault();document.getElementById('note').focus();}">
         </div>
       </div>
       <div class="field-group">
@@ -295,6 +295,43 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="modal">
     <div class="modal-title">✏️ แก้ไขรายการ</div>
     <input type="hidden" id="edit-id">
+    <div class="modal-row">
+      <div class="modal-lbl">หมวด</div>
+      <select class="modal-input" id="edit-cat">
+        <option value="ค่าอาหาร">🍜 ค่าอาหาร</option>
+        <option value="ซื้อของ">🛍️ ซื้อของ</option>
+        <option value="หลิงหลิง">👶 หลิงหลิง</option>
+        <option value="น้ำ ไฟ เน็ต Netflix">⚡️ น้ำ ไฟ เน็ต Netflix</option>
+        <option value="ท่องเที่ยว">✈️ ท่องเที่ยว</option>
+        <option value="อื่นๆ">📦 อื่นๆ</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">ช่องทางชำระ</div>
+      <select class="modal-input" id="edit-pay" onchange="toggleEditSub()">
+        <option value="เงินสด">💵 เงินสด</option>
+        <option value="ธนาคาร">🏦 โอนธนาคาร</option>
+        <option value="บัตรเครดิต">💳 บัตรเครดิต</option>
+      </select>
+    </div>
+    <div class="modal-row" id="edit-sub-row" style="display:none">
+      <div class="modal-lbl">บัตรเครดิต</div>
+      <select class="modal-input" id="edit-sub">
+        <option value="TTB">TTB</option>
+        <option value="SCB">SCB</option>
+        <option value="KBANK">KBANK</option>
+        <option value="UOB">UOB</option>
+        <option value="KTC">KTC</option>
+      </select>
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">วันที่</div>
+      <input class="modal-input" id="edit-date" type="date">
+    </div>
+    <div class="modal-row">
+      <div class="modal-lbl">วันที่</div>
+      <input class="modal-input" id="edit-date" type="date">
+    </div>
     <div class="modal-row">
       <div class="modal-lbl">จำนวนเงิน (บาท)</div>
       <input class="modal-input" id="edit-amount" type="number" inputmode="decimal">
@@ -401,9 +438,11 @@ function saveEntry(){
   if(!selPayVal){showToast('เลือกช่องทางชำระก่อนนะ','a');return;}
   if(selPayVal==='บัตรเครดิต'&&!selSubVal){showToast('เลือกบัตรเครดิตให้ครบก่อนนะ','a');return;}
   if(!amt||amt<=0){showToast('ใส่จำนวนเงินก่อนนะ','a');return;}
+  const noteVal=document.getElementById('note').value.trim();
+  if(!noteVal){showToast('ใส่รายละเอียดก่อนนะ','a');document.getElementById('note').focus();return;}
   const n=new Date();
   const entry={id:Date.now(),cat:selCatVal,pay:selPayVal,sub:selSubVal,amount:amt,
-    note:document.getElementById('note').value.trim(),
+    note:noteVal,
     date:n.toISOString(),d:n.getDate(),m:n.getMonth(),y:n.getFullYear(),synced:false};
   const all=getEntries();all.push(entry);setEntries(all);
   document.getElementById('amount').value='';document.getElementById('note').value='';
@@ -466,24 +505,51 @@ function deleteEntry(id){
 function openEdit(id){
   const entry=getEntries().find(e=>e.id===id);if(!entry)return;
   document.getElementById('edit-id').value=id;
+  document.getElementById('edit-cat').value=entry.cat||'ค่าอาหาร';
+  document.getElementById('edit-pay').value=entry.pay||'เงินสด';
+  document.getElementById('edit-sub').value=entry.sub||'TTB';
   document.getElementById('edit-amount').value=entry.amount;
   document.getElementById('edit-note').value=entry.note||'';
+  // set date field
+  const d=new Date(entry.date);
+  const yyyy=d.getFullYear();
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  document.getElementById('edit-date').value=yyyy+'-'+mm+'-'+dd;
+  toggleEditSub();
   document.getElementById('modal').classList.add('show');
+}
+function toggleEditSub(){
+  const pay=document.getElementById('edit-pay').value;
+  document.getElementById('edit-sub-row').style.display=pay==='บัตรเครดิต'?'block':'none';
 }
 function closeModal(){document.getElementById('modal').classList.remove('show');}
 function saveEdit(){
   const id=Number(document.getElementById('edit-id').value);
+  const cat=document.getElementById('edit-cat').value;
+  const pay=document.getElementById('edit-pay').value;
+  const sub=pay==='บัตรเครดิต'?document.getElementById('edit-sub').value:'';
   const amt=parseFloat(document.getElementById('edit-amount').value);
   const note=document.getElementById('edit-note').value.trim();
+  const dateVal=document.getElementById('edit-date').value;
   if(!amt||amt<=0){showToast('ใส่จำนวนเงิน','a');return;}
+  if(!note){showToast('ใส่รายละเอียดก่อนนะ','a');return;}
   const all=getEntries();const idx=all.findIndex(e=>e.id===id);
-  if(idx>=0){all[idx].amount=amt;all[idx].note=note;setEntries(all);}
+  if(idx>=0){
+    all[idx].cat=cat;all[idx].pay=pay;all[idx].sub=sub;
+    all[idx].amount=amt;all[idx].note=note;
+    if(dateVal){
+      const nd=new Date(dateVal);
+      all[idx].date=nd.toISOString();
+      all[idx].d=nd.getDate();all[idx].m=nd.getMonth();all[idx].y=nd.getFullYear();
+    }
+    setEntries(all);
+  }
   closeModal();updateSyncStatus();renderSummary();showToast('แก้ไขแล้ว ✓','g');
-  // sync edit to Sheets
   const url=getUrl();
   if(url&&idx>=0){
     const form=new FormData();
-    form.append('payload',JSON.stringify({action:'edit',entry:{id:String(id),amount:amt,note:note}}));
+    form.append('payload',JSON.stringify({action:'edit',entry:{id:String(id),cat:cat,pay:pay,sub:sub,amount:amt,note:note,date:dateVal}}));
     fetch(url,{method:'POST',mode:'no-cors',body:form}).catch(()=>{});
   }
 }
