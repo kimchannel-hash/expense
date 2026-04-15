@@ -472,7 +472,7 @@ function openEdit(id){
 }
 function closeModal(){document.getElementById('modal').classList.remove('show');}
 function saveEdit(){
-  const id=parseInt(document.getElementById('edit-id').value);
+  const id=Number(document.getElementById('edit-id').value);
   const amt=parseFloat(document.getElementById('edit-amount').value);
   const note=document.getElementById('edit-note').value.trim();
   if(!amt||amt<=0){showToast('ใส่จำนวนเงิน','a');return;}
@@ -483,7 +483,7 @@ function saveEdit(){
   const url=getUrl();
   if(url&&idx>=0){
     const form=new FormData();
-    form.append('payload',JSON.stringify({action:'edit',entry:{id:id,amount:amt,note:note}}));
+    form.append('payload',JSON.stringify({action:'edit',entry:{id:String(id),amount:amt,note:note}}));
     fetch(url,{method:'POST',mode:'no-cors',body:form}).catch(()=>{});
   }
 }
