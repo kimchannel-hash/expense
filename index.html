@@ -477,9 +477,15 @@ function saveEdit(){
   const note=document.getElementById('edit-note').value.trim();
   if(!amt||amt<=0){showToast('ใส่จำนวนเงิน','a');return;}
   const all=getEntries();const idx=all.findIndex(e=>e.id===id);
-  if(idx>=0){all[idx].amount=amt;all[idx].note=note;all[idx].synced=false;setEntries(all);}
+  if(idx>=0){all[idx].amount=amt;all[idx].note=note;setEntries(all);}
   closeModal();updateSyncStatus();renderSummary();showToast('แก้ไขแล้ว ✓','g');
-  if(getUrl()&&idx>=0)syncEntry(all[idx]);
+  // sync edit to Sheets
+  const url=getUrl();
+  if(url&&idx>=0){
+    const form=new FormData();
+    form.append('payload',JSON.stringify({action:'edit',entry:{id:id,amount:amt,note:note}}));
+    fetch(url,{method:'POST',mode:'no-cors',body:form}).catch(()=>{});
+  }
 }
 
 function chMonth(d){viewM+=d;if(viewM>11){viewM=0;viewY++;}if(viewM<0){viewM=11;viewY--;}renderSummary();}
