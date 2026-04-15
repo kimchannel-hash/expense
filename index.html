@@ -93,43 +93,43 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 /* SUMMARY */
 .month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.mnav-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:8px 16px;color:var(--text2);font-size:16px;cursor:pointer;}
-.month-name{font-size:17px;font-weight:600;}
+.mnav-btn{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:10px 20px;color:var(--text2);font-size:20px;cursor:pointer;}
+.month-name{font-size:20px;font-weight:600;}
 .total-hero{background:linear-gradient(135deg,rgba(0,229,160,0.15),rgba(0,212,200,0.07));border:1px solid rgba(0,229,160,0.25);border-radius:var(--r2);padding:22px;margin-bottom:14px;}
-.total-lbl{font-size:11px;color:var(--green);font-family:var(--mono);letter-spacing:1px;margin-bottom:8px;}
+.total-lbl{font-size:14px;color:var(--green);font-family:var(--mono);letter-spacing:1px;margin-bottom:8px;}
 .total-amt{font-size:40px;font-weight:700;color:var(--green);font-family:var(--mono);letter-spacing:-1px;}
 .pay-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
 .pay-mini{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 10px;text-align:center;}
-.pay-mini-icon{font-size:20px;margin-bottom:4px;}
-.pay-mini-lbl{font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;}
-.pay-mini-val{font-size:14px;font-weight:600;font-family:var(--mono);}
+.pay-mini-icon{font-size:26px;margin-bottom:6px;}
+.pay-mini-lbl{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;}
+.pay-mini-val{font-size:16px;font-weight:600;font-family:var(--mono);}
 .sub-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
 .sub-mini{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;}
-.sub-mini-lbl{font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;}
-.sub-mini-val{font-size:13px;font-weight:600;font-family:var(--mono);}
+.sub-mini-lbl{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:4px;}
+.sub-mini-val{font-size:16px;font-weight:600;font-family:var(--mono);}
 .divider{height:1px;background:var(--border);margin:14px 0;}
 .cat-block{margin-bottom:10px;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
 .cat-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;position:relative;overflow:hidden;}
 .cat-head-bg{position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:72px;opacity:0.07;pointer-events:none;line-height:1;}
 .cat-head-left{display:flex;align-items:center;gap:8px;position:relative;z-index:1;}
-.cat-head-icon{font-size:18px;}
-.cat-head-name{font-size:14px;font-weight:600;}
-.cat-head-total{font-size:16px;font-weight:700;font-family:var(--mono);position:relative;z-index:1;}
+.cat-head-icon{font-size:22px;}
+.cat-head-name{font-size:17px;font-weight:600;}
+.cat-head-total{font-size:18px;font-weight:700;font-family:var(--mono);position:relative;z-index:1;}
 .entry-item{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg);}
 .entry-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
 .entry-left{flex:1;min-width:0;}
-.entry-date{font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:2px;}
-.entry-note{font-size:14px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.entry-date{font-size:14px;color:var(--text3);font-family:var(--mono);margin-bottom:2px;}
+.entry-note{font-size:16px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .entry-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
-.entry-amount{font-size:15px;font-weight:600;font-family:var(--mono);display:flex;align-items:center;gap:5px;}
+.entry-amount{font-size:17px;font-weight:600;font-family:var(--mono);display:flex;align-items:center;gap:5px;}
 .entry-sdot{width:5px;height:5px;border-radius:50%;background:var(--text3);}
 .entry-sdot.ok{background:var(--green);}
-.entry-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-family:var(--mono);}
+.entry-badge{font-size:13px;padding:3px 10px;border-radius:20px;font-family:var(--mono);}
 .badge-cash{background:rgba(0,229,160,0.12);color:var(--green);}
 .badge-bank{background:rgba(91,156,246,0.12);color:var(--blue);}
 .badge-card{background:rgba(180,138,255,0.12);color:var(--purple);}
 .entry-actions{display:flex;gap:5px;margin-top:6px;}
-.action-btn{font-size:11px;padding:4px 10px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-weight:600;}
+.action-btn{font-size:14px;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-weight:600;}
 .edit-btn{background:rgba(91,156,246,0.12);color:var(--blue);}
 .del-btn{background:rgba(255,77,109,0.1);color:var(--red);}
 .empty-state{text-align:center;padding:52px 20px;color:var(--text3);font-size:14px;}
@@ -369,46 +369,23 @@ async function restoreFromSheets(){
   if(!url){showToast('ยังไม่ได้เชื่อมต่อ','a');return;}
   showToast('กำลังดึงข้อมูล...','a');
   try{
-    const res=await fetch(url+'?action=getAll',{method:'GET',mode:'cors'});
-    const json=await res.json();
-    if(json.status==='ok'&&json.entries&&json.entries.length>0){
-      const restored=json.entries.map(e=>({
-        id:Number(e.id),cat:e.cat,pay:e.pay,sub:e.sub==='-'?'':e.sub,
-        amount:parseFloat(e.amount)||0,note:e.note,
-        date:e.isoDate||new Date().toISOString(),
-        d:parseInt(e.day)||1,m:parseInt(e.month)-1||0,y:parseInt(e.year)||2026,
-        synced:true
-      }));
-      setEntries(restored);
-      updateSyncStatus();renderSummary();
-      showToast('กู้คืนแล้ว '+restored.length+' รายการ','g');
-    } else {
-      showToast('ไม่พบข้อมูลใน Sheets','a');
-    }
-  }catch(err){
-    showToast('ดึงข้อมูลไม่ได้ ลองใหม่','r');
-  }
-}
-
-async function restoreFromSheets(){
-  const url=getUrl();
-  if(!url){showToast('ยังไม่ได้เชื่อมต่อ','a');return;}
-  showToast('กำลังดึงข้อมูล...','a');
-  try{
     const res=await fetch(url+'?action=getAll');
     const json=await res.json();
     if(json.status==='ok'&&json.entries&&json.entries.length>0){
-      const restored=json.entries.map(e=>({
-        id:Number(e.id),cat:e.cat,pay:e.pay,
-        sub:(e.sub&&e.sub!=='-')?e.sub:'',
-        amount:parseFloat(e.amount)||0,
-        note:e.note||'',
-        date:e.isoDate||new Date().toISOString(),
-        d:parseInt(e.day)||1,
-        m:parseInt(e.month)-1,
-        y:parseInt(e.year)||2026,
-        synced:true
-      }));
+      const restored=json.entries.map(e=>{
+        const d=new Date(e.isoDate||new Date().toISOString());
+        return {
+          id:Number(e.id),cat:e.cat,pay:e.pay,
+          sub:(e.sub&&e.sub!=='-')?e.sub:'',
+          amount:parseFloat(e.amount)||0,
+          note:e.note||'',
+          date:d.toISOString(),
+          d:d.getDate(),
+          m:d.getMonth(),
+          y:d.getFullYear(),
+          synced:true
+        };
+      });
       setEntries(restored);
       updateSyncStatus();renderSummary();
       showToast('กู้คืนแล้ว '+restored.length+' รายการ ✓','g');
