@@ -166,16 +166,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       <div class="header-day" id="today-date"></div>
       <div class="header-title">จดรายจ่าย</div>
     </div>
-    <div class="sync-pill">
-      <div class="sync-dot" id="sync-dot"></div>
-      <span id="sync-label">—</span>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="sync-pill">
+        <div class="sync-dot" id="sync-dot"></div>
+        <span id="sync-label">—</span>
+      </div>
+      <button onclick="switchTab('setup')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:50%;width:38px;height:38px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">⚙️</button>
     </div>
   </div>
 
   <div class="tab-bar">
     <div class="tab active" onclick="switchTab('add')">+ บันทึก</div>
     <div class="tab" onclick="switchTab('summary')">สรุป</div>
-    <div class="tab" onclick="switchTab('setup')">ตั้งค่า</div>
   </div>
 
   <div class="content">
@@ -356,6 +358,7 @@ const CAT_META={
   'อื่นๆ':{icon:'📦',color:'#8892b0',bg:'rgba(136,146,176,0.1)'}
 };
 let selCatVal='',selPayVal='',selSubVal='';
+let filterKey='';
 let viewM=new Date().getMonth(),viewY=new Date().getFullYear();
 const now=new Date();
 document.getElementById('today-date').textContent=DAYS[now.getDay()]+' '+now.getDate()+' '+MONTHS[now.getMonth()]+' '+(now.getFullYear()+543);
@@ -412,9 +415,13 @@ function updateSyncStatus(){
 }
 
 function switchTab(t){
-  ['add','summary','setup'].forEach((s,i)=>{
-    document.querySelectorAll('.tab')[i].classList.toggle('active',s===t);
-    document.getElementById('tab-'+s).classList.toggle('active',s===t);
+  ['add','summary'].forEach((s,i)=>{
+    const tab=document.querySelectorAll('.tab')[i];
+    if(tab) tab.classList.toggle('active',s===t);
+  });
+  ['add','summary','setup'].forEach(s=>{
+    const el=document.getElementById('tab-'+s);
+    if(el) el.classList.toggle('active',s===t);
   });
   document.getElementById('save-wrap').style.display=t==='add'?'':'none';
   if(t==='summary')renderSummary();
@@ -585,7 +592,7 @@ function saveEdit(){
   }
 }
 
-function chMonth(d){viewM+=d;if(viewM>11){viewM=0;viewY++;}if(viewM<0){viewM=11;viewY--;}renderSummary();}
+function chMonth(d){viewM+=d;if(viewM>11){viewM=0;viewY++;}if(viewM<0){viewM=11;viewY--;}filterKey='';renderSummary();}
 function fmt(n){return n.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0});}
 function payBadge(e){
   const cls=e.pay==='เงินสด'?'badge-cash':e.pay==='ธนาคาร'?'badge-bank':'badge-card';
@@ -593,9 +600,14 @@ function payBadge(e){
   return `<span class="entry-badge ${cls}">${lbl}</span>`;
 }
 
+function filterBy(key){
+  filterKey=(filterKey===key)?'':key;
+  renderSummary();
+}
+
 function renderSummary(){
   document.getElementById('month-label').textContent=MONTHS[viewM]+' '+(viewY+543);
-  const all=getEntries().filter(e=>e.m===viewM&&e.y===viewY);
+  let all=getEntries().filter(e=>e.m===viewM&&e.y===viewY);
   const el=document.getElementById('summary-body');
   if(!all.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">📭</span>ยังไม่มีรายการในเดือนนี้</div>';return;}
   const total=all.reduce((s,e)=>s+e.amount,0);
