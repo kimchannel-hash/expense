@@ -607,31 +607,45 @@ function filterBy(key){
 
 function renderSummary(){
   document.getElementById('month-label').textContent=MONTHS[viewM]+' '+(viewY+543);
-  let all=getEntries().filter(e=>e.m===viewM&&e.y===viewY);
+  const all=getEntries().filter(e=>e.m===viewM&&e.y===viewY);
   const el=document.getElementById('summary-body');
   if(!all.length){el.innerHTML='<div class="empty-state"><span class="empty-icon">📭</span>ยังไม่มีรายการในเดือนนี้</div>';return;}
+
+  // totals always from full data
   const total=all.reduce((s,e)=>s+e.amount,0);
   const cash=all.filter(e=>e.pay==='เงินสด').reduce((s,e)=>s+e.amount,0);
   const bank=all.filter(e=>e.pay==='ธนาคาร').reduce((s,e)=>s+e.amount,0);
   const cc=all.filter(e=>e.pay==='บัตรเครดิต').reduce((s,e)=>s+e.amount,0);
   const subs={};all.filter(e=>e.sub).forEach(e=>{if(!subs[e.sub])subs[e.sub]=0;subs[e.sub]+=e.amount;});
-  const cats={};all.forEach(e=>{if(!cats[e.cat])cats[e.cat]=[];cats[e.cat].push(e);});
+
+  // filtered data for category breakdown
+  const shown=filterKey?all.filter(e=>{
+    if(filterKey==='เงินสด'||filterKey==='ธนาคาร'||filterKey==='บัตรเครดิต') return e.pay===filterKey;
+    return e.sub===filterKey;
+  }):all;
+
+  const sel=(k)=>filterKey===k?'outline:2px solid var(--green);box-shadow:0 0 8px rgba(0,229,160,0.3);':'';
   let html=`
     <div class="total-hero">
-      <div class="total-lbl">รายจ่ายรวม · ${MONTHS[viewM]}</div>
-      <div class="total-amt">฿${fmt(total)}</div>
+      <div class="total-lbl">${filterKey?'กรอง: '+filterKey+' · ':''}รายจ่าย · ${MONTHS[viewM]}</div>
+      <div class="total-amt">฿${fmt(shown.reduce((s,e)=>s+e.amount,0))}</div>
+      ${filterKey?`<div style="margin-top:8px"><button onclick="filterBy('')" style="background:rgba(255,77,109,0.15);border:1px solid var(--red);border-radius:20px;padding:5px 14px;color:var(--red);font-size:13px;cursor:pointer;font-family:var(--font);">✕ ยกเลิกกรอง</button></div>`:''}
     </div>
     <div class="pay-grid">
-      <div class="pay-mini"><div class="pay-mini-icon">💵</div><div class="pay-mini-lbl">เงินสด</div><div class="pay-mini-val" style="color:#00e5a0">฿${fmt(cash)}</div></div>
-      <div class="pay-mini"><div class="pay-mini-icon">🏦</div><div class="pay-mini-lbl">ธนาคาร</div><div class="pay-mini-val" style="color:#5b9cf6">฿${fmt(bank)}</div></div>
-      <div class="pay-mini"><div class="pay-mini-icon">💳</div><div class="pay-mini-lbl">บัตรเครดิต</div><div class="pay-mini-val" style="color:#b48aff">฿${fmt(cc)}</div></div>
+      <div class="pay-mini" onclick="filterBy('เงินสด')" style="cursor:pointer;${sel('เงินสด')}"><div class="pay-mini-icon">💵</div><div class="pay-mini-lbl">เงินสด</div><div class="pay-mini-val" style="color:#00e5a0">฿${fmt(cash)}</div></div>
+      <div class="pay-mini" onclick="filterBy('ธนาคาร')" style="cursor:pointer;${sel('ธนาคาร')}"><div class="pay-mini-icon">🏦</div><div class="pay-mini-lbl">ธนาคาร</div><div class="pay-mini-val" style="color:#5b9cf6">฿${fmt(bank)}</div></div>
+      <div class="pay-mini" onclick="filterBy('บัตรเครดิต')" style="cursor:pointer;${sel('บัตรเครดิต')}"><div class="pay-mini-icon">💳</div><div class="pay-mini-lbl">บัตรเครดิต</div><div class="pay-mini-val" style="color:#b48aff">฿${fmt(cc)}</div></div>
     </div>`;
   if(Object.keys(subs).length){
     html+=`<div class="sub-grid">`;
-    Object.entries(subs).forEach(([k,v])=>{html+=`<div class="sub-mini"><div class="sub-mini-lbl">${k}</div><div class="sub-mini-val">฿${fmt(v)}</div></div>`;});
+    Object.entries(subs).forEach(([k,v])=>{
+      html+=`<div class="sub-mini" onclick="filterBy('${k}')" style="cursor:pointer;${sel(k)}"><div class="sub-mini-lbl">${k}</div><div class="sub-mini-val">฿${fmt(v)}</div></div>`;
+    });
     html+=`</div>`;
   }
   html+=`<div class="divider"></div>`;
+  const cats={};shown.forEach(e=>{if(!cats[e.cat])cats[e.cat]=[];cats[e.cat].push(e);});
+  if(!shown.length){html+=`<div class="empty-state">ไม่มีรายการในช่องทางนี้</div>`;}
   Object.entries(cats).forEach(([cat,items])=>{
     const m=CAT_META[cat]||CAT_META['อื่นๆ'];
     const catTotal=items.reduce((s,e)=>s+e.amount,0);
